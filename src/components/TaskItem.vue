@@ -11,7 +11,6 @@ defineProps({
 </script>
 
 <template>
-
   <md-List-item type="button">
     <md-List-item-content>
       <md-List-item-title>{{ taskName }}</md-List-item-title>

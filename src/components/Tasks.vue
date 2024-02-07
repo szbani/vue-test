@@ -2,7 +2,6 @@
 import TaskItem from "@/components/TaskItem.vue";
 
 export default {
-
   components: {
     TaskItem
   },
@@ -25,7 +24,7 @@ export default {
       // while(this.activeGame){
       console.log('Creating tasks');
       this.activeGameInterval = setInterval(() => {
-        if (this.taskNumber < 10)
+        if (this.tasks.length < 10)
           this.addTask('Task ' + this.taskNumber++);
       }, 2000);
       // }
@@ -44,13 +43,16 @@ export default {
 </script>
 
 <template>
-  <md-List class="h-100">
+  <md-List>
     <div v-for="(task,index) in tasks" :key="index">
-      <TaskItem :taskName="task.name"></TaskItem>
+      <TaskItem :taskName="task.name"/>
     </div>
   </md-List>
 </template>
 
 <style scoped>
 
+md-list-item {
+  border: 1px solid rgba(167, 133, 133, 0.39);
+}
 </style>
