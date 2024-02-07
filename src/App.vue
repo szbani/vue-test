@@ -1,7 +1,7 @@
 <script setup>
 import HelloWorld from './components/HelloWorld.vue'
 import TheWelcome from './components/TheWelcome.vue'
-import TaskItem from'./components/TaskItem.vue'
+import Tasks from'./components/Tasks.vue'
 </script>
 
 <template>
@@ -10,12 +10,11 @@ import TaskItem from'./components/TaskItem.vue'
 
     <div class="wrapper">
       <HelloWorld msg="You did it!" />
-      <TaskItem />
     </div>
   </header>
 
   <main>
-    <TheWelcome />
+    <Tasks />
   </main>
 </template>
 
