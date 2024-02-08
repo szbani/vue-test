@@ -45,7 +45,8 @@ export default {
 <template>
   <md-List>
     <div v-for="(task,index) in tasks" :key="index">
-      <TaskItem :taskName="task.name"/>
+      <TaskItem :taskName="task.name" :taskPoints="Math.ceil(Math.random()*500+500)" :time="Math.ceil(Math.random()*10)+10"/>
+      <md-divider v-if="task != tasks.at(tasks.length-1)" class="m-2"/>
     </div>
   </md-List>
 </template>
