@@ -31,7 +31,6 @@ const startTime = () => {
         // console.log("time is up")
         clearInterval(timer);
         timer = null;
-        this.$destroy()
         // Do something when time is up, like emit an event or show a message
       }
     }, 200);
