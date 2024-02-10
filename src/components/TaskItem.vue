@@ -1,21 +1,18 @@
 <script setup>
-import { onMounted, ref} from 'vue';
+import {onMounted, ref, defineProps, defineEmits} from 'vue';
 
-const { taskName, taskPoints, time} = defineProps({
-  taskName: {
-    type: String,
-    required: true
-  },
-  taskPoints: {
-    type: Number,
-    required: true
-  },
-  time: {
-    type: Number,
+const emits = defineEmits(['timerZero']);
+
+const {task} = defineProps({
+  task: {
+    type: Object,
     required: true
   },
 });
 
+const {id, taskName, taskPoints, time} = task;
+
+let taskRef = ref(task);
 let timer = null;
 let taskPointsRef = ref(taskPoints)
 let timeRef = ref(time)
@@ -23,17 +20,19 @@ let timeRemaining = ref(time);
 
 const startTime = () => {
   console.log("StartTime");
-    timer = setInterval(() => {
-      // console.log(timeRemaining);
-      if (timeRemaining.value > 0) {
-        timeRemaining.value -= 0.2;
-      } else {
-        // console.log("time is up")
-        clearInterval(timer);
-        timer = null;
-        // Do something when time is up, like emit an event or show a message
-      }
-    }, 200);
+  timer = setInterval(() => {
+    // console.log(timeRemaining);
+    if (timeRemaining.value > 0) {
+      timeRemaining.value -= 0.1;
+    } else {
+      // console.log("time is up")
+      clearInterval(timer);
+      timer = null;
+      console.log(taskRef.value);
+      emits('timerZero', taskRef.value);
+      // Do something when time is up, like emit an event or show a message
+    }
+  }, 100);
 };
 
 const pauseTime = () => {

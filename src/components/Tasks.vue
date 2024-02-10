@@ -1,8 +1,11 @@
 <script setup>
 import TaskItem from "@/components/TaskItem.vue";
-import { ref, onMounted } from 'vue';
+import {ref, onMounted} from 'vue';
 
 const tasks = ref([]);
+
+const maxTasks = 2;
+
 let taskNumber = 1;
 let activeGame = true;
 let activeGameInterval = null;
@@ -14,7 +17,7 @@ onMounted(() => {
 const startCreatingTasks = () => {
   console.log('Creating tasks');
   activeGameInterval = setInterval(() => {
-    if (tasks.value.length < 10)
+    if (tasks.value.length < maxTasks)
       addTask('Task ' + taskNumber++);
   }, 2000);
 };
@@ -25,16 +28,28 @@ const stopCreatingTasks = () => {
 };
 
 const addTask = (taskName) => {
-  tasks.value.push({ name: taskName });
+  tasks.value.push({
+    id: taskNumber,
+    taskName,
+    taskPoints: Math.ceil(Math.random() * 500 + 500),
+    time: Math.ceil(Math.random() * 0) + 5
+  });
 };
+
+const deleteTask = (taskToDelete) => {
+  console.log('Deleting task', taskToDelete);
+  console.log('Before', tasks.value);
+  let taskid = tasks.value.findIndex(taskToDelete.valueOf);
+  console.log('taskToDelete:', taskid);
+};
+
 </script>
 
 <template>
   <md-List>
     <div v-for="(task,index) in tasks" :key="index">
-      <TaskItem :taskName="task.name" :taskPoints="Math.ceil(Math.random()*500+500)"
-                :time="Math.ceil(Math.random()*10)+10"/>
-      <md-divider v-if="task != tasks.at(tasks.length-1)" class="m-2"/>
+      <TaskItem :task="task" @timerZero="deleteTask($event)"/>
+      <md-divider v-if="index !== tasks.length - 1" class="m-2"/>
     </div>
   </md-List>
 </template>
