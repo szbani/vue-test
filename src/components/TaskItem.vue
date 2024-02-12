@@ -1,5 +1,5 @@
 <script setup>
-import {onMounted, ref, defineProps, defineEmits} from 'vue';
+import {onMounted, ref, defineProps} from 'vue';
 
 const emits = defineEmits(['timerZero']);
 
@@ -17,22 +17,24 @@ let timer = null;
 let taskPointsRef = ref(taskPoints)
 let timeRef = ref(time)
 let timeRemaining = ref(time);
+const progress = ref(100)
 
 const startTime = () => {
   console.log("StartTime");
   timer = setInterval(() => {
-    // console.log(timeRemaining);
-    if (timeRemaining.value > 0) {
-      timeRemaining.value -= 0.1;
-    } else {
-      // console.log("time is up")
-      clearInterval(timer);
-      timer = null;
-      console.log(taskRef.value);
-      emits('timerZero', taskRef.value);
-      // Do something when time is up, like emit an event or show a message
-    }
-  }, 100);
+    timerLogic();
+  }, 1000);
+};
+
+const timerLogic = () => {
+  if (timeRemaining.value > 0) {
+    timeRemaining.value -= 1;
+    progress.value = (timeRemaining.value / time) * 100;
+  } else {
+    clearInterval(timer);
+    timer = null;
+    emits('timerZero');
+  }
 };
 
 const pauseTime = () => {
@@ -44,26 +46,27 @@ const pauseTime = () => {
   }
 };
 
+
 onMounted(() => {
-  // You can set timeRemaining here directly from the props
   startTime()
 });
 </script>
 
 
 <template>
-  <md-List-item type="button" @click="pauseTime">
+  <v-list-item type="button" @click="pauseTime">
     <div slot="headline">{{ taskName }}</div>
     <div slot="supporting-text">
-      <md-linear-progress :value="timeRemaining / timeRef"/>
+      <v-progress-linear v-model="progress"/>
     </div>
-    <div slot="trailing-supporting-text">{{ taskPointsRef }}</div>
-  </md-List-item>
+    <div slot="trailing">{{ taskPointsRef }}</div>
+  </v-list-item>
 </template>
 
 <style scoped>
 md-list-item {
   border: 1px solid rgba(167, 133, 133, 0.39);
 }
+
 
 </style>

@@ -1,0 +1,18 @@
+//@import  'vuetify/_settings.scss';
+//
+@use 'vuetify/settings' as settings;
+
+settings.$progress-linear-transition: 1s linear;
+
+
+
+$primary-color: #333;
+
+//.v-progress-linear {
+//  color: $primary-color;
+//  font-size: 24px;
+//  font-weight: 400;
+//  margin: 0 0 20px 0;
+//}
+
+
