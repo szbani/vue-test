@@ -1,27 +1,31 @@
 <script>
 import TaskItem from "@/components/TaskItem.vue";
-import {ref, onMounted, computed} from 'vue';
-import {mapState, mapActions} from "vuex";
-import $store from '@/assets/serverConn.js';
+import {ref, inject} from 'vue';
+import {serverStartTaskCreation} from "@/assets/serverConn.js";
+
 export default {
   components: {
     TaskItem
   },
-  computed: {
-    ...mapState(['tasks'])
-  },
-  methods:{
-    ...mapActions(['startCreatingTasks', 'taskActiveToSocket'])
-  },
-  // setup() {
-  //
-  //
-  //   let activeGame = true;
-  //   // let activeGameInterval = null;
+  // computed: {
+  //   ...mapState(['tasks'])
   // },
+  // methods:{
+  //   ...mapActions(['startCreatingTasks', 'taskActiveToSocket'])
+  // },
+  setup() {
+    // const tasks = inject('tasks');
+    setInterval(() => {
+      console.log(tasks.value);
+    }, 1000);
+    // const tasks = ref([]);
+    // let activeGame = true;
+    // let activeGameInterval = null;
+  },
   mounted() {
+    serverStartTaskCreation();
     // this.startCreatingTasks();
-    this.store.dispatch('startCreatingTasks');
+    // this.store.dispatch('startCreatingTasks');
   }
 }
 
