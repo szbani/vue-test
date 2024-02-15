@@ -1,12 +1,14 @@
 <script>
 import TaskItem from "@/components/TaskItem.vue";
-import {ref, inject} from 'vue';
+import {computed} from 'vue';
 import {serverStartTaskCreation} from "@/assets/serverConn.js";
+import {useStore} from "vuex";
 
 export default {
   components: {
     TaskItem
   },
+
   // computed: {
   //   ...mapState(['tasks'])
   // },
@@ -14,16 +16,16 @@ export default {
   //   ...mapActions(['startCreatingTasks', 'taskActiveToSocket'])
   // },
   setup() {
-    // const tasks = inject('tasks');
-    setInterval(() => {
-      console.log(tasks.value);
-    }, 1000);
-    // const tasks = ref([]);
-    // let activeGame = true;
-    // let activeGameInterval = null;
+    const store = useStore();
+
+    const tasks = computed(() => store.getters.getTasks);
+
+    return {
+      tasks
+    };
   },
-  mounted() {
-    serverStartTaskCreation();
+  mounted(){
+    serverStartTaskCreation()
     // this.startCreatingTasks();
     // this.store.dispatch('startCreatingTasks');
   }

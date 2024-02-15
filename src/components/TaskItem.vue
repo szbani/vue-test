@@ -1,5 +1,6 @@
 <script setup>
 import {onMounted, ref, defineProps} from 'vue';
+import {setTaskActive} from "@/assets/serverConn.js";
 
 const emits = defineEmits(['timerZero']);
 
@@ -37,6 +38,10 @@ const timerLogic = () => {
   }
 };
 
+const startTask = () => {
+  setTaskActive(taskRef.value, true);
+}
+
 const pauseTime = () => {
   if (timer == null)
     startTime();
@@ -54,7 +59,7 @@ onMounted(() => {
 
 
 <template>
-  <v-list-item type="button" @click="pauseTime">
+  <v-list-item type="button" @click="startTask">
     <div slot="headline">{{ taskName }}</div>
     <div slot="supporting-text">
       <v-progress-linear v-model="progress"/>

@@ -1,6 +1,7 @@
 import './assets/main.css';
 // import 'bootstrap';
 // import 'bootstrap/dist/css/bootstrap.css'
+import store from "@/assets/vuex.js";
 
 import { createApp } from 'vue';
 import App from './App.vue';
@@ -18,6 +19,7 @@ export default createVuetify()
 
 const app = createApp(App);
 app.use(vuetify);
+app.use(store);
 app.mount('#app');
 
 

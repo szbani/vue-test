@@ -39,9 +39,12 @@ io.on('connection', socket => {
         stopTaskCreation();
     });
 
-    socket.on('taskActive', (task) => {
+    socket.on('taskActive', (task,isactive) => {
         console.log('TaskActive: ' + task.taskName);
+        Tasks.setTaskActive(task,isactive);
     });
+
+    // socket.on('')
 
 });
 
@@ -71,18 +74,26 @@ const Tasks = {
     timerStart(task) {
         const timer = setInterval(() => {
             if (!task.active) {
-                task.timeRemaining -= 1;
-                console.log(task.timeRemaining + ' ' + task.taskName);
                 if (task.timeRemaining <= 0) {
                     clearInterval(timer);
                     this.deleteTask(task);
                 }
+                task.timeRemaining -= 1;
+                console.log(task.timeRemaining + ' ' + task.taskName);
             }
         }, 1000)
     },
     deleteTask(task) {
         this.tasks.splice(this.tasks.indexOf(task), 1)
-    }
+        io.emit('tasksUpdated', this.tasks);
+    },
+    setTaskActive(taskt,isActive) {
+        console.log(taskt);
+        const task = Tasks.tasks.find(t => t.id === taskt.id);
+        console.log(task);
+        task.active = !!isActive;
+        io.emit('tasksUpdated', this.tasks);
+    },
 };
 
 function startTaskCreation() {

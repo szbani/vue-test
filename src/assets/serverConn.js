@@ -1,5 +1,5 @@
 import {io} from 'socket.io-client';
-import { provide } from 'vue';
+import store from "@/assets/vuex.js";
 const socket = io('http://localhost:8080');
 socket.on('liveContent', (data) => {
     // this.liveContent = data;
@@ -10,13 +10,13 @@ socket.on('message', (data) => {
 });
 socket.on("tasksUpdated", (data) => {
     console.log(data)
-    provide('tasks',data);
+    store.dispatch('setTasks', data);
 });
+
+export function setTaskActive(task,isactive){
+    socket.emit('taskActive',task,isactive);
+}
 
 export function serverStartTaskCreation(){
     socket.emit('startTaskCreation');
-}
-
-export function setTaskActive(task){
-    socket.emit('taskActive',task);
 }
