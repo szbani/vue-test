@@ -1,4 +1,6 @@
 // const websocket = require('ws');
+import {Task} from "@/assets/Task";
+
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
@@ -18,6 +20,7 @@ io.on('connection', socket => {
     console.log('Client connected');
     startTaskCreation();
     socket.emit('message', 'Welcome to the chat!');
+    socket.emit('tasksUpdated', this.tasks);
 
     socket.on('message', message => {
         console.log('Received: ' + message);
@@ -39,9 +42,9 @@ io.on('connection', socket => {
         stopTaskCreation();
     });
 
-    socket.on('taskActive', (task,isactive) => {
+    socket.on('taskActive', (task,isActive) => {
         console.log('TaskActive: ' + task.taskName);
-        Tasks.setTaskActive(task,isactive);
+        Tasks.setTaskActive(task,isActive);
     });
 
     // socket.on('')
@@ -52,21 +55,15 @@ function broadcast(data) {
     io.emit('liveContent', data);
 }
 
-// id taskname taskpoint time, reamining time
 let taskCreateTimer = null;
 let taskNumber = 1;
 const Tasks = {
     tasks: [],
     addTask() {
+        const name = 'task ' + taskNumber;
+        const point = Math.ceil(Math.random() * 500 + 500);
         const time = Math.ceil(Math.random() * 10 + 10);
-        const task = {
-            id: taskNumber,
-            taskName: 'task ' + taskNumber,
-            taskPoints: Math.ceil(Math.random() * 500 + 500),
-            time: time,
-            timeRemaining: time,
-            active: false,
-        }
+        const task = new Task(taskNumber,name,point,time)
         this.tasks.push(task);
         taskNumber++;
         this.timerStart(task);
@@ -79,7 +76,6 @@ const Tasks = {
                     this.deleteTask(task);
                 }
                 task.timeRemaining -= 1;
-                console.log(task.timeRemaining + ' ' + task.taskName);
             }
         }, 1000)
     },
@@ -88,10 +84,8 @@ const Tasks = {
         io.emit('tasksUpdated', this.tasks);
     },
     setTaskActive(taskt,isActive) {
-        console.log(taskt);
         const task = Tasks.tasks.find(t => t.id === taskt.id);
-        console.log(task);
-        task.active = !!isActive;
+        task.active = isActive;
         io.emit('tasksUpdated', this.tasks);
     },
 };

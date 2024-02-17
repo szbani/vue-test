@@ -1,6 +1,7 @@
 <script setup>
-import {onMounted, ref, defineProps} from 'vue';
+import {onMounted, ref, defineProps, reactive} from 'vue';
 import {setTaskActive} from "@/assets/serverConn.js";
+import { Task } from "@/assets/Task.js"
 
 const emits = defineEmits(['timerZero']);
 
@@ -8,29 +9,26 @@ const {task} = defineProps({
   task: {
     type: Object,
     required: true
-  },
+  }
 });
 
 const {id, taskName, taskPoints, time} = task;
 
-let taskRef = ref(task);
+let taskRef = task;
 let timer = null;
-let taskPointsRef = ref(taskPoints)
-let timeRef = ref(time)
-let timeRemaining = ref(time);
-const progress = ref(100)
+const progress = ref((taskRef.timeRemaining / time) * 100)
 
 const startTime = () => {
-  console.log("StartTime");
+  // console.log("StartTime");
   timer = setInterval(() => {
     timerLogic();
   }, 1000);
 };
 
 const timerLogic = () => {
-  if (timeRemaining.value > 0) {
-    timeRemaining.value -= 1;
-    progress.value = (timeRemaining.value / time) * 100;
+  if (taskRef.timeRemaining > 0 && !taskRef.active) {
+    taskRef.timeRemaining -= 1;
+    progress.value = (taskRef.timeRemaining / time) * 100;
   } else {
     clearInterval(timer);
     timer = null;
@@ -39,7 +37,16 @@ const timerLogic = () => {
 };
 
 const startTask = () => {
-  setTaskActive(taskRef.value, true);
+  // console.log(taskRef)
+  if (!taskRef.active) {
+    taskRef.active = true;
+    setTaskActive(taskRef, true);
+  }else{
+    taskRef.active = false;
+    setTaskActive(taskRef,false);
+  }
+  // console.log(taskRef.value.active);
+  pauseTime();
 }
 
 const pauseTime = () => {
@@ -60,11 +67,11 @@ onMounted(() => {
 
 <template>
   <v-list-item type="button" @click="startTask">
-    <div slot="headline">{{ taskName }}</div>
+    <div slot="headline">{{ taskRef.taskName }}</div>
     <div slot="supporting-text">
       <v-progress-linear v-model="progress"/>
     </div>
-    <div slot="trailing">{{ taskPointsRef }}</div>
+    <div slot="trailing">{{ taskRef.taskPoints }}</div>
   </v-list-item>
 </template>
 
