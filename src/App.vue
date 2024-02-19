@@ -8,9 +8,6 @@ import Tasks from './components/Tasks.vue'
 
 <template>
   <header>
-    <h1>
-      Feladatok
-    </h1>
   </header>
   <main>
     <Tasks/>

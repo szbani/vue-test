@@ -1,15 +1,15 @@
 // const websocket = require('ws');
-import {Task} from "@/assets/Task";
+import {Task} from "./assets/Task.js";
 
-const express = require('express');
-const http = require('http');
-const socketIo = require('socket.io');
+import express from 'express';
+import http from 'http';
+import {Server} from 'socket.io';
 
 // const wss = new websocket.Server({port: 8080});
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server, {
+const io = new Server(server, {
     cors: {
         origin: "http://localhost:5173",
         methods: ["GET", "POST"],
@@ -20,7 +20,9 @@ io.on('connection', socket => {
     console.log('Client connected');
     startTaskCreation();
     socket.emit('message', 'Welcome to the chat!');
-    socket.emit('tasksUpdated', this.tasks);
+    if (Tasks.tasks.length > 0) {
+        socket.emit('tasksUpdated', Tasks.getValidTasks());
+    }
 
     socket.on('message', message => {
         console.log('Received: ' + message);
@@ -42,9 +44,9 @@ io.on('connection', socket => {
         stopTaskCreation();
     });
 
-    socket.on('taskActive', (task,isActive) => {
-        console.log('TaskActive: ' + task.taskName);
-        Tasks.setTaskActive(task,isActive);
+    socket.on('taskActive', (taskID, isActive) => {
+        console.log('TaskActive: ' + taskID + ' ' + isActive);
+        Tasks.setTaskActive(taskID, isActive);
     });
 
     // socket.on('')
@@ -63,30 +65,20 @@ const Tasks = {
         const name = 'task ' + taskNumber;
         const point = Math.ceil(Math.random() * 500 + 500);
         const time = Math.ceil(Math.random() * 10 + 10);
-        const task = new Task(taskNumber,name,point,time)
+        const task = new Task(taskNumber, name, point, time)
+        // task.startTimer();
         this.tasks.push(task);
         taskNumber++;
-        this.timerStart(task);
+        // this.timerStart(task);
     },
-    timerStart(task) {
-        const timer = setInterval(() => {
-            if (!task.active) {
-                if (task.timeRemaining <= 0) {
-                    clearInterval(timer);
-                    this.deleteTask(task);
-                }
-                task.timeRemaining -= 1;
-            }
-        }, 1000)
+    getValidTasks() {
+        return this.tasks.filter(task => !task.inactive);
     },
-    deleteTask(task) {
-        this.tasks.splice(this.tasks.indexOf(task), 1)
-        io.emit('tasksUpdated', this.tasks);
-    },
-    setTaskActive(taskt,isActive) {
-        const task = Tasks.tasks.find(t => t.id === taskt.id);
-        task.active = isActive;
-        io.emit('tasksUpdated', this.tasks);
+    setTaskActive(taskID, isActive) {
+        const task = Tasks.tasks.find(t => t.data.id === taskID);
+        // console.log(task);
+        task.data.active = isActive;
+        io.emit('tasksUpdated', this.getValidTasks());
     },
 };
 
@@ -96,9 +88,11 @@ function startTaskCreation() {
         console.log('Creating tasks');
         taskCreateTimer = setInterval(() => {
             // console.log(Tasks.tasks);
-            if (Tasks.tasks.length < maxTasks) {
+            // const valid = Tasks.getValidTasks();
+            // console.log();
+            if (Tasks.getValidTasks().length < maxTasks) {
                 Tasks.addTask();
-                io.emit('tasksUpdated', Tasks.tasks);
+                io.emit('tasksUpdated', Tasks.getValidTasks());
             }
         }, 2000);
     }

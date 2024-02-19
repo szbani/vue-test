@@ -9,12 +9,13 @@ socket.on('message', (data) => {
     console.log(data)
 });
 socket.on("tasksUpdated", (data) => {
-    console.log(data)
+    // console.log(data)
     store.dispatch('setTasks', data);
 });
 
-export function setTaskActive(task,isactive){
-    socket.emit('taskActive',task,isactive);
+export function setTaskActive(taskID,isActive){
+    // store.dispatch('setTaskActive',{taskID,isActive});
+    socket.emit('taskActive',taskID,isActive);
 }
 
 export function serverStartTaskCreation(){

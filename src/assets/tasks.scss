@@ -2,7 +2,8 @@
 //
 @use 'vuetify/settings' as settings;
 
-settings.$progress-linear-transition: 1s linear;
+settings.$progress-linear-transition: 0.1s linear;
+settings.$progress-linear-background: rgba(0, 0, 0, 0.15);
 
 
 

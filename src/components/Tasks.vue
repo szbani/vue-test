@@ -1,46 +1,51 @@
 <script>
 import TaskItem from "@/components/TaskItem.vue";
-import {computed, reactive} from 'vue';
+import {computed} from 'vue';
 import {serverStartTaskCreation} from "@/assets/serverConn.js";
 import {useStore} from "vuex";
-import {Task} from '@/assets/Task.js'
+import {Task} from "../../server/assets/Task.js";
 
 export default {
+  computed: {
+    Task() {
+      return Task
+    }
+  },
   components: {
     TaskItem
   },
-
-  // computed: {
-  //   ...mapState(['tasks'])
-  // },
-  // methods:{
-  //   ...mapActions(['startCreatingTasks', 'taskActiveToSocket'])
-  // },
   setup() {
     const store = useStore();
-
     const tasks = computed(() => store.getters.getTasks);
-
+    // watch(() => tasks.value, (newVal) => {
+    //   console.log(newVal);
+    // });
     return {
       tasks
     };
   },
   mounted() {
     serverStartTaskCreation()
-    // this.startCreatingTasks();
-    // this.store.dispatch('startCreatingTasks');
+  },
+  methods: {
+    deletTask(index) {
+      this.$store.commit('removeTask', index);
+    }
   }
 }
 
 </script>
 
 <template>
-  <v-list lines="one">
-    <div v-for="(task,index) in tasks" :key="task.id">
-      <TaskItem :task="task"/>
-      <!--      <md-divider v-if="index !== tasks.length - 1" class="m-2"/>-->
-    </div>
-  </v-list>
+  <v-sheet height="500px" class="pa-6 bg-amber-lighten-2" >
+    <h1>Feladatok</h1>
+    <v-list lines="one" class="bg-amber-accent-1">
+      <div v-for="(task,index) in tasks" :key="task.data.id+ '_' + task.data.active + '_' + task.timerActive">
+        <TaskItem v-if="!task.inactive" :task="Task.fromObject(task)" @timerZero="deletTask(index)" class="mt-2"/>
+        <!--      <md-divider v-if="index !== tasks.length - 1" class="m-2"/>-->
+      </div>
+    </v-list>
+  </v-sheet>
 </template>
 
 <style scoped>

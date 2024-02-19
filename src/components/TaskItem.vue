@@ -1,77 +1,48 @@
 <script setup>
-import {onMounted, ref, defineProps, reactive} from 'vue';
+import {defineProps, computed, watch} from 'vue';
 import {setTaskActive} from "@/assets/serverConn.js";
-import { Task } from "@/assets/Task.js"
+import {Task} from "../../server/assets/Task.js"
 
 const emits = defineEmits(['timerZero']);
 
 const {task} = defineProps({
   task: {
-    type: Object,
+    type: Task,
     required: true
   }
 });
+const progress = computed(() => task.data.timeRemaining / task.data.time * 100);
 
-const {id, taskName, taskPoints, time} = task;
-
-let taskRef = task;
-let timer = null;
-const progress = ref((taskRef.timeRemaining / time) * 100)
-
-const startTime = () => {
-  // console.log("StartTime");
-  timer = setInterval(() => {
-    timerLogic();
-  }, 1000);
-};
-
-const timerLogic = () => {
-  if (taskRef.timeRemaining > 0 && !taskRef.active) {
-    taskRef.timeRemaining -= 1;
-    progress.value = (taskRef.timeRemaining / time) * 100;
-  } else {
-    clearInterval(timer);
-    timer = null;
-    emits('timerZero');
+watch(() => task.data.timeRemaining, (newVal) => {
+  if (newVal <= 0) {
+    setTimeout(() => {
+      emits('timerZero');
+    }, 100);
+    // emits('timerZero');
   }
-};
-
-const startTask = () => {
-  // console.log(taskRef)
-  if (!taskRef.active) {
-    taskRef.active = true;
-    setTaskActive(taskRef, true);
-  }else{
-    taskRef.active = false;
-    setTaskActive(taskRef,false);
-  }
-  // console.log(taskRef.value.active);
-  pauseTime();
-}
-
-const pauseTime = () => {
-  if (timer == null)
-    startTime();
-  else {
-    clearInterval(timer);
-    timer = null;
-  }
-};
-
-
-onMounted(() => {
-  startTime()
 });
+
+const signUpToTask = () => {
+  if (!task.data.active) {
+    setTaskActive(task.data.id, true);
+  } else {
+    setTaskActive(task.data.id, false);
+  }
+};
+
 </script>
 
 
 <template>
-  <v-list-item type="button" @click="startTask">
-    <div slot="headline">{{ taskRef.taskName }}</div>
-    <div slot="supporting-text">
-      <v-progress-linear v-model="progress"/>
-    </div>
-    <div slot="trailing">{{ taskRef.taskPoints }}</div>
+  <v-list-item type="button" @click="signUpToTask" class="pa-0">
+<!--    <v-expand-x-transition>-->
+      <v-sheet v-show="task.data.active" class="w-100 h-100 position-absolute" color="rgba(0,0,0,0.5)"/>
+      <v-progress-linear class="h-100 w-100 d-block position-absolute" v-model="progress"/>
+<!--    </v-expand-x-transition>-->
+    <div slot="headline" class="ps-3 text-h6 font-weight-black">{{ task.data.name }}</div>
+<!--    <div slot="supporting-text">-->
+<!--    </div>-->
+    <div slot="trailing" class="ps-3 text-subtitle-1 font-weight-bold">pont: {{ task.data.point }}</div>
   </v-list-item>
 </template>
 
