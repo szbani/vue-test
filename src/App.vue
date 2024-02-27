@@ -10,8 +10,9 @@ import Tasks from './components/Tasks.vue'
   <header>
   </header>
   <main>
-    <Tasks/>
-    <connection/>
+    <router-link to="/game/tasks">Tasks</router-link>
+    <router-link to="/">Home</router-link>
+    <router-view></router-view>
 
   </main>
 </template>

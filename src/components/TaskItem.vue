@@ -34,16 +34,18 @@ const signUpToTask = () => {
 
 
 <template>
-  <v-list-item type="button" @click="signUpToTask" class="pa-0">
-<!--    <v-expand-x-transition>-->
+  <router-link :to="`/game/${task.data.id}`">
+    <v-list-item type="button" @click="signUpToTask" class="pa-0">
+      <!--    <v-expand-x-transition>-->
       <v-sheet v-show="task.data.active" class="w-100 h-100 position-absolute" color="rgba(0,0,0,0.5)"/>
       <v-progress-linear class="h-100 w-100 d-block position-absolute" v-model="progress"/>
-<!--    </v-expand-x-transition>-->
-    <div slot="headline" class="ps-3 text-h6 font-weight-black">{{ task.data.name }}</div>
-<!--    <div slot="supporting-text">-->
-<!--    </div>-->
-    <div slot="trailing" class="ps-3 text-subtitle-1 font-weight-bold">pont: {{ task.data.point }}</div>
-  </v-list-item>
+      <!--    </v-expand-x-transition>-->
+      <div slot="headline" class="ps-3 text-h6 font-weight-black">{{ task.data.name }}</div>
+      <!--    <div slot="supporting-text">-->
+      <!--    </div>-->
+      <div slot="trailing" class="ps-3 text-subtitle-1 font-weight-bold">pont: {{ task.data.point }}</div>
+    </v-list-item>
+  </router-link>
 </template>
 
 <style scoped>
