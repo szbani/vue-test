@@ -1,8 +1,5 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
 import './assets/serverConn.js';
-import Tasks from './components/Tasks.vue'
 
 </script>
 
@@ -11,7 +8,7 @@ import Tasks from './components/Tasks.vue'
   </header>
   <main>
     <router-link to="/game/tasks">Tasks</router-link>
-    <router-link to="/">Home</router-link>
+    <router-link to="/">Menu</router-link>
     <router-view></router-view>
 
   </main>

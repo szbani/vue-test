@@ -17,7 +17,9 @@ export function setTaskActive(taskID,isActive){
     // store.dispatch('setTaskActive',{taskID,isActive});
     socket.emit('taskActive',taskID,isActive);
 }
-
+export function getTasksUpdate(){
+    socket.emit('getTasksUpdate');
+}
 export function serverStartTaskCreation(){
     socket.emit('startTaskCreation');
 }

@@ -1,5 +1,5 @@
 <script setup>
-import {defineProps, computed, watch} from 'vue';
+import {computed, watch} from 'vue';
 import {setTaskActive} from "@/assets/serverConn.js";
 import {Task} from "../../server/assets/Task.js"
 
@@ -34,8 +34,8 @@ const signUpToTask = () => {
 
 
 <template>
-  <router-link :to="`/game/${task.data.id}`">
-    <v-list-item type="button" @click="signUpToTask" class="pa-0">
+  <router-link  :to="`/game/${task.data.id}`" class="pa-0">
+    <v-list-item type="button" @click="signUpToTask" class="pa-0 mt-3">
       <!--    <v-expand-x-transition>-->
       <v-sheet v-show="task.data.active" class="w-100 h-100 position-absolute" color="rgba(0,0,0,0.5)"/>
       <v-progress-linear class="h-100 w-100 d-block position-absolute" v-model="progress"/>

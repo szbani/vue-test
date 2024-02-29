@@ -49,6 +49,10 @@ io.on('connection', socket => {
         Tasks.setTaskActive(taskID, isActive);
     });
 
+    socket.on('getTasksUpdate', () => {
+        console.log('Sending tasks update');
+        socket.emit('tasksUpdated', Tasks.getValidTasks());
+    });
     // socket.on('')
 
 });

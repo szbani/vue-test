@@ -9,6 +9,7 @@ const store = createStore({
             state.ongoingTasks.push(task)
         },
         setTasks(state, tasks) {
+            // console.log(tasks);
             state.ongoingTasks = tasks;
         },
         removeTask(state, index) {
