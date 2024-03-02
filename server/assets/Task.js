@@ -14,7 +14,6 @@ export class Task {
         this.timerActive = true;
         this.startTimer();
     }
-
     startTimer() {
         const timer = setInterval(() => {
             if (!this.data.active && this.timerActive) {

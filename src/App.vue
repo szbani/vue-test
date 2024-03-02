@@ -1,5 +1,5 @@
 <script setup>
-import './assets/serverConn.js';
+// import './assets/serverConn.js';
 
 </script>
 
@@ -7,8 +7,14 @@ import './assets/serverConn.js';
   <header>
   </header>
   <main>
-    <router-link to="/game/tasks">Tasks</router-link>
-    <router-link to="/">Menu</router-link>
+    <nav class="bg-blue-lighten-2 d-inline-flex w-100">
+      <router-link to="/game/tasks">
+        <v-btn>Tasks</v-btn>
+      </router-link>
+      <router-link to="/">
+        <v-btn>Menu</v-btn>
+      </router-link>
+    </nav>
     <router-view></router-view>
 
   </main>

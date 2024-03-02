@@ -1,9 +1,10 @@
 // const websocket = require('ws');
 import {Task} from "./assets/Task.js";
-
+import {Player} from "./assets/player.js"
 import express from 'express';
 import http from 'http';
 import {Server} from 'socket.io';
+import { v4 as uuidv4 } from 'uuid'; // Import UUID library
 
 // const wss = new websocket.Server({port: 8080});
 
@@ -16,9 +17,14 @@ const io = new Server(server, {
     }
 });
 
+const connections = {}
+
 io.on('connection', socket => {
     console.log('Client connected');
     startTaskCreation();
+    const userId = uuidv4();
+    connections[userId] = socket;
+
     socket.emit('message', 'Welcome to the chat!');
     if (Tasks.tasks.length > 0) {
         socket.emit('tasksUpdated', Tasks.getValidTasks());
@@ -55,6 +61,10 @@ io.on('connection', socket => {
     });
     // socket.on('')
 
+    socket.on('close',() => {
+        console.log('Client disconnected')
+        delete connections[userId];
+    })
 });
 
 function broadcast(data) {
@@ -111,3 +121,18 @@ const PORT = process.env.PORT || 8080;
 server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
+
+const Players = {
+    players: [],
+    addPlayer(player){
+        this.players.put(player);
+    },
+    resetPlayer(){
+        this.players.clear;
+    },
+    updatePlayer(player){
+        this.players.players.find(p => p.data.id === player.data.id);
+    },
+
+};
+

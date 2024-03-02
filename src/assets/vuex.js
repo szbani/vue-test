@@ -1,8 +1,11 @@
 import { createStore } from 'vuex'
+import { Player } from '../../server/assets/player.js'
 
 const store = createStore({
     state() {
         ongoingTasks: []
+        player: Player
+        players: []
     },
     mutations: {
         addTask(state, task) {
@@ -14,7 +17,13 @@ const store = createStore({
         },
         removeTask(state, index) {
             state.ongoingTasks.splice(index, 1)
-        }
+        },
+        addPlayer(state, player){
+            players.push(player);
+        },
+        setPlayer(state, player){
+            state.player = player;
+        },
     },
     actions:{
         addTask(context, task) {
@@ -25,10 +34,16 @@ const store = createStore({
         },
         removeTask(context, index) {
             context.commit('removeTask', index);
-        }
+        },
+        setPlayer(context,player){
+            context.commit('setPlayer',player);
+            context.commit('addPlayer',player);
+        },
     },
     getters:{
         getTasks: state => state.ongoingTasks,
+        getPlayers: state => state.players,
+        getPlayer: state => state.player,
     }
 });
 

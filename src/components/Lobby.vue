@@ -1,5 +1,10 @@
 <script>
+import {connectToWebSocket} from "@/assets/serverConn.js";
+
 export default {
+  setup(){
+    connectToWebSocket();
+  }
 }
 </script>
 

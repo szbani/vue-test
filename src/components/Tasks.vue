@@ -40,7 +40,7 @@ export default {
 </script>
 
 <template>
-  <v-sheet height="500px" class="pa-6 bg-amber-lighten-2" >
+  <v-sheet height="500px" class="pa-6 bg-amber-lighten-3" >
     <h1>Feladatok</h1>
     <v-list lines="one" class="bg-amber-accent-1">
       <div v-for="(task,index) in tasks" :key="task">
