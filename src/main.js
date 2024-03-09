@@ -16,6 +16,7 @@ const vuetify = createVuetify({
         configFile: 'src/assets/tasks.scss',
     }
 });
+
 export default createVuetify()
 
 // const Home = {template: '<div>Home</div>'}
@@ -24,7 +25,7 @@ const routes = [
     {path: '/game/tasks', component: tasks},
     {path: '/', component: Menu},
     {path: '/game/:taskID', component: Task, props: true},
-    {path: '/game/lobby', component: Lobby, props: true}
+    {path: '/game/lobby', component: Lobby,}
 ]
 
 const router = VueRouter.createRouter({

@@ -1,11 +1,12 @@
-import { createStore } from 'vuex'
-import { Player } from '../../server/assets/player.js'
+import {createStore} from 'vuex'
+import {Player} from '../../server/assets/player.js'
 
 const store = createStore({
     state() {
         ongoingTasks: []
         player: Player
         players: []
+        gameMaster: false
     },
     mutations: {
         addTask(state, task) {
@@ -18,14 +19,21 @@ const store = createStore({
         removeTask(state, index) {
             state.ongoingTasks.splice(index, 1)
         },
-        addPlayer(state, player){
-            players.push(player);
+        addPlayer(state, player) {
+            if (state.players != null)state.players.push(player);
+            else state.players = [player];
         },
-        setPlayer(state, player){
+        setPlayer(state, player) {
             state.player = player;
         },
+        setPlayers(state, players) {
+            state.players = players;
+        },
+        setGameMaster(state, bool) {
+            state.gameMaster = bool;
+        }
     },
-    actions:{
+    actions: {
         addTask(context, task) {
             context.commit('addTask', task);
         },
@@ -35,15 +43,22 @@ const store = createStore({
         removeTask(context, index) {
             context.commit('removeTask', index);
         },
-        setPlayer(context,player){
-            context.commit('setPlayer',player);
-            context.commit('addPlayer',player);
+        setPlayer(context, player) {
+            context.commit('setPlayer', player);
+            context.commit('addPlayer', player);
+        },
+        setPlayers(context, players) {
+            context.commit('setPlayers', players);
+        },
+        setGameMaster(context, bool) {
+            context.commit('setGameMaster', bool);
         },
     },
-    getters:{
+    getters: {
         getTasks: state => state.ongoingTasks,
         getPlayers: state => state.players,
         getPlayer: state => state.player,
+        isGameMaster: state => state.gameMaster,
     }
 });
 

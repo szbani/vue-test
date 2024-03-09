@@ -1,20 +1,45 @@
 <script>
+import store from "@/assets/vuex.js";
+import {connectToWebSocket, newPlayer} from "@/assets/serverConn.js";
+
 export default {
   data: () => ({
+    password: '',
+    PW: 'AdminPW',
     name: '',
-    rules: [
+    gameMasterPW: [
       value => {
         if (!value) {
-          return 'Név megadása kötelező';
+          return 'Jelszó megadása kötelező';
         }
         return true;
       }
     ],
+    playerRules: [
+      value => {
+        if (!value) {
+          return 'Nem Adtál meg nevet';
+        }
+        return true;
+      }
+    ]
   }),
+  setup() {
+  },
   methods: {
-    handleGameLogin(){
-      if(this.name == '') return;
-      this.$router.push({path: '/game/lobby',query: {name: this.name}});
+    handleGameLogin() {
+      if (this.name == '') return;
+      connectToWebSocket(this.$router);
+      newPlayer(this.name);
+      store.dispatch('setGameMaster', false);
+      this.$router.push({path: '/game/lobby'});
+      return;
+    },
+    gameMasterLogin() {
+      if (this.password !== this.PW) return 'Hibás jelszó';
+      connectToWebSocket(this.$router);
+      store.dispatch('setGameMaster', true);
+      this.$router.push({path: '/game/lobby'});
       return;
     }
   }
@@ -23,9 +48,17 @@ export default {
 
 <template>
   <v-sheet>
+    <h4 class="text-h6 font-weight-bold ma-2 mt-3" >Játékos</h4>
     <v-form @submit.prevent="handleGameLogin">
-      <v-text-field label="Név" v-model="name" :rules="rules"></v-text-field>
-      <v-btn class="mt-2" type="submit">Kész</v-btn>
+      <v-text-field label="Név" v-model="name" :rules="playerRules"></v-text-field>
+      <v-btn class="mt-2" type="submit">Belépés</v-btn>
+    </v-form>
+  </v-sheet>
+  <v-sheet class="mt-5">
+    <h4 class="text-h6 font-weight-bold ma-2 mt-3">JátékMester</h4>
+    <v-form @submit.prevent="gameMasterLogin">
+      <v-text-field label="Jelszó" v-model="password" :rules="gameMasterPW"></v-text-field>
+      <v-btn class="mt-2" type="submit">Belépés</v-btn>
     </v-form>
   </v-sheet>
 </template>

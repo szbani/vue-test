@@ -4,7 +4,7 @@ import {Player} from "./assets/player.js"
 import express from 'express';
 import http from 'http';
 import {Server} from 'socket.io';
-import { v4 as uuidv4 } from 'uuid'; // Import UUID library
+import {v4 as uuidv4} from 'uuid';
 
 // const wss = new websocket.Server({port: 8080});
 
@@ -34,22 +34,6 @@ io.on('connection', socket => {
         console.log('Received: ' + message);
     });
 
-    socket.on('close', () => {
-        console.log('Client disconnected');
-    });
-
-    socket.on('startTaskCreation', () => {
-        console.log('Starting task creation');
-        setInterval(() => {
-            startTaskCreation()
-        }, 2000);
-    });
-
-    socket.on('stopTaskCreation', () => {
-        console.log('Stopping task creation');
-        stopTaskCreation();
-    });
-
     socket.on('taskActive', (taskID, isActive) => {
         console.log('TaskActive: ' + taskID + ' ' + isActive);
         Tasks.setTaskActive(taskID, isActive);
@@ -60,17 +44,41 @@ io.on('connection', socket => {
         socket.emit('tasksUpdated', Tasks.getValidTasks());
     });
     // socket.on('')
+    socket.on('newPlayer', (playerName) => {
+        console.log('new player:' + playerName)
+        const newPlayer = new Player(userId, playerName);
+        Players.addPlayer(newPlayer);
+        socket.emit('setPlayer', newPlayer);
+        io.emit('sendPlayers', Players.players);
+    });
+    socket.on('getPlayers', () => {
+        // console.log(Players.players);
+        socket.emit('sendPlayers', Players.players);
+    });
 
-    socket.on('close',() => {
+    socket.on('startGame', () => {
+        console.log('Game started');
+        // console.log(Players.players);
+        Players.players.forEach(player => {
+            // console.log(player.data.id);
+            connections[player.data.id].emit('gameStarted');
+        });
+    });
+
+    socket.on('close', () => {
         console.log('Client disconnected')
         delete connections[userId];
-    })
+    });
 });
 
-function broadcast(data) {
-    io.emit('liveContent', data);
+export function sendPlayersToPlayer(userId) {
+    const socket = connections[userId];
+    if (socket) {
+        socket.emit(Players.players);
+    }
 }
 
+// id taskname taskpoint time, reamining time
 let taskCreateTimer = null;
 let taskNumber = 1;
 const Tasks = {
@@ -96,7 +104,7 @@ const Tasks = {
     },
 };
 
-function startTaskCreation() {
+export function startTaskCreation() {
     if (taskCreateTimer == null) {
         const maxTasks = 2;
         console.log('Creating tasks');
@@ -112,7 +120,7 @@ function startTaskCreation() {
     }
 }
 
-function stopTaskCreation() {
+export function stopTaskCreation() {
     clearInterval(taskCreateTimer);
     taskCreateTimer = null;
 }
@@ -124,13 +132,13 @@ server.listen(PORT, () => {
 
 const Players = {
     players: [],
-    addPlayer(player){
-        this.players.put(player);
+    addPlayer(player) {
+        this.players.push(player);
     },
-    resetPlayer(){
+    resetPlayer() {
         this.players.clear;
     },
-    updatePlayer(player){
+    updatePlayer(player) {
         this.players.players.find(p => p.data.id === player.data.id);
     },
 
