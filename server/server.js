@@ -58,6 +58,7 @@ io.on('connection', socket => {
 
     socket.on('startGame', () => {
         console.log('Game started');
+        gameStarted = true;
         // console.log(Players.players);
         Players.players.forEach(player => {
             // console.log(player.data.id);
@@ -65,9 +66,15 @@ io.on('connection', socket => {
         });
     });
 
+    socket.on('isGameStarted', () => {
+        socket.emit('gameStarted', gameStarted);
+    });
+
     socket.on('close', () => {
         console.log('Client disconnected')
         delete connections[userId];
+        Players.deletePlayer(userId);
+        io.emit('sendPlayers', Players.players);
     });
 });
 
@@ -81,6 +88,7 @@ export function sendPlayersToPlayer(userId) {
 // id taskname taskpoint time, reamining time
 let taskCreateTimer = null;
 let taskNumber = 1;
+let gameStarted = false;
 const Tasks = {
     tasks: [],
     addTask() {
@@ -141,6 +149,9 @@ const Players = {
     updatePlayer(player) {
         this.players.players.find(p => p.data.id === player.data.id);
     },
+    deletePlayer(id){
+        this.players = this.players.filter(player => player.data.id !== id);
+    }
 
 };
 

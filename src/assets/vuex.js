@@ -59,6 +59,7 @@ const store = createStore({
         getPlayers: state => state.players,
         getPlayer: state => state.player,
         isGameMaster: state => state.gameMaster,
+        isConnected: state => state.player != null,
     }
 });
 

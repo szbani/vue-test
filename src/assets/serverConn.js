@@ -24,13 +24,17 @@ export function connectToWebSocket($router) {
         store.dispatch('setPlayers', data);
     });
     socket.on('setPlayer', (data) => {
-        console.log(data);
+        // console.log(data);
         store.dispatch('setPlayer', data);
     });
     socket.on('gameStarted', () => {
         console.log('Game started');
         $router.push('/game/tasks');
     });
+}
+
+export function isConnected(){
+    return socket !== null;
 }
 
 export function setTaskActive(taskID, isActive) {
@@ -51,6 +55,9 @@ export function newPlayer(playerName) {
 }
 export function serverStartGame(){
     socket.emit('startGame');
+}
+export function isGameStarted(){
+    return socket.emit('isGameStarted');
 }
 export function getPlayers() {
     socket.emit('getPlayers');

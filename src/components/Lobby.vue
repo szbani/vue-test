@@ -1,19 +1,25 @@
 <script>
-import {getPlayers, serverStartGame} from "@/assets/serverConn.js";
+import {getPlayers, isConnected, serverStartGame} from "@/assets/serverConn.js";
 import {useStore} from "vuex";
 import {computed} from "vue";
 
 export default {
+  mounted() {
+    if (!isConnected()) this.$router.push({path: '/'});
+  },
   setup() {
-    getPlayers();
-    const store = useStore();
-    const players = computed(() => store.getters.getPlayers);
-    const gameMaster = computed(() => store.getters.isGameMaster);
-    console.log(gameMaster.value);
-    return {
-      players,
-      gameMaster
-    };
+    if (isConnected()) {
+      getPlayers();
+      const store = useStore();
+      const players = computed(() => store.getters.getPlayers);
+      const gameMaster = computed(() => store.getters.isGameMaster);
+      console.log(gameMaster.value);
+      return {
+        players,
+        gameMaster
+      };
+    }
+    return {};
   },
   methods: {
     startGame(){
@@ -25,7 +31,7 @@ export default {
 </script>
 
 <template>
-  <!--    <v-btn @click="getUsers">getusers</v-btn>-->
+<!--      <v-btn @click="getUsers">getusers</v-btn>-->
   <div v-for="(player,index) in players" :key="player.data.id+'_'+player.data.connected">
     <v-card>
       <v-card-item :title="player.data.name" :subtitle="player.data.point">

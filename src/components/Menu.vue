@@ -1,6 +1,6 @@
 <script>
 import store from "@/assets/vuex.js";
-import {connectToWebSocket, newPlayer} from "@/assets/serverConn.js";
+import {connectToWebSocket, isConnected, isGameStarted, newPlayer} from "@/assets/serverConn.js";
 
 export default {
   data: () => ({
@@ -15,6 +15,7 @@ export default {
         return true;
       }
     ],
+    connected: false,
     playerRules: [
       value => {
         if (!value) {
@@ -24,34 +25,52 @@ export default {
       }
     ]
   }),
+  mounted() {
+  },
   setup() {
+    const connected = store.getters.isConnected;
+    if (connected) {
+      const player = store.getters.getPlayer;
+      return {connected, player};
+    }
+    return {connected};
   },
   methods: {
+    isConnected,
     handleGameLogin() {
       if (this.name == '') return;
       connectToWebSocket(this.$router);
       newPlayer(this.name);
       store.dispatch('setGameMaster', false);
       this.$router.push({path: '/game/lobby'});
-      return;
     },
     gameMasterLogin() {
       if (this.password !== this.PW) return 'Hibás jelszó';
       connectToWebSocket(this.$router);
       store.dispatch('setGameMaster', true);
       this.$router.push({path: '/game/lobby'});
-      return;
-    }
+    },
+    reconnectToGame() {
+      if(isGameStarted()) this.$router.push({path: '/game/tasks'});
+      else this.$router.push({path: '/game/lobby'});
+      // connectToWebSocket(this.$router);
+    },
   }
 }
 </script>
 
 <template>
-  <v-sheet>
-    <h4 class="text-h6 font-weight-bold ma-2 mt-3" >Játékos</h4>
+  <v-sheet v-if="!isConnected()">
+    <h4 class="text-h6 font-weight-bold ma-2 mt-3">Játékos</h4>
     <v-form @submit.prevent="handleGameLogin">
       <v-text-field label="Név" v-model="name" :rules="playerRules"></v-text-field>
       <v-btn class="mt-2" type="submit">Belépés</v-btn>
+    </v-form>
+  </v-sheet>
+  <v-sheet v-else>
+    <h4 class="text-h6 font-weight-bold ma-2 mt-3">Újracsatlakozás</h4>
+    <v-form @submit.prevent="reconnectToGame">
+      <v-btn class="mt-2" type="submit">Újracsatlakozás</v-btn>
     </v-form>
   </v-sheet>
   <v-sheet class="mt-5">
