@@ -7,6 +7,7 @@ const store = createStore({
         player: Player
         players: []
         gameMaster: false
+        gameStarted: false
     },
     mutations: {
         addTask(state, task) {
@@ -31,6 +32,9 @@ const store = createStore({
         },
         setGameMaster(state, bool) {
             state.gameMaster = bool;
+        },
+        setGameStarted(state,bool){
+            state.gameStarted = bool;
         }
     },
     actions: {
@@ -53,6 +57,16 @@ const store = createStore({
         setGameMaster(context, bool) {
             context.commit('setGameMaster', bool);
         },
+        setGameStarted(context,bool){
+            context.commit('setGameStarted',bool);
+        },
+        endGame(context) {
+            context.commit('setTasks', []);
+            context.commit('setPlayer', null);
+            context.commit('setPlayers', []);
+            context.commit('setGameMaster', false);
+            context.commit('setGameStarted',false);
+        }
     },
     getters: {
         getTasks: state => state.ongoingTasks,
@@ -60,6 +74,7 @@ const store = createStore({
         getPlayer: state => state.player,
         isGameMaster: state => state.gameMaster,
         isConnected: state => state.player != null,
+        isGameStarted: state => state.gameStarted,
     }
 });
 

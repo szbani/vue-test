@@ -1,6 +1,6 @@
 <script>
 import store from "@/assets/vuex.js";
-import {connectToWebSocket, isConnected, isGameStarted, newPlayer} from "@/assets/serverConn.js";
+import {connectToWebSocket, isConnected, getGameStarted, newPlayer} from "@/assets/serverConn.js";
 
 export default {
   data: () => ({
@@ -51,7 +51,8 @@ export default {
       this.$router.push({path: '/game/lobby'});
     },
     reconnectToGame() {
-      if(isGameStarted()) this.$router.push({path: '/game/tasks'});
+      getGameStarted();
+      if(store.getters.isGameStarted) this.$router.push({path: '/game/tasks'});
       else this.$router.push({path: '/game/lobby'});
       // connectToWebSocket(this.$router);
     },
@@ -76,7 +77,7 @@ export default {
   <v-sheet class="mt-5">
     <h4 class="text-h6 font-weight-bold ma-2 mt-3">JátékMester</h4>
     <v-form @submit.prevent="gameMasterLogin">
-      <v-text-field label="Jelszó" v-model="password" :rules="gameMasterPW"></v-text-field>
+      <v-text-field label="Jelszó" v-model="password" type="password" :rules="gameMasterPW"></v-text-field>
       <v-btn class="mt-2" type="submit">Belépés</v-btn>
     </v-form>
   </v-sheet>

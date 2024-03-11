@@ -1,7 +1,7 @@
 <script>
 import TaskItem from "@/components/TaskItem.vue";
 import {computed} from 'vue';
-import {getTasksUpdate, isConnected} from "@/assets/serverConn.js";
+import {endGame, getTasksUpdate, isConnected} from "@/assets/serverConn.js";
 import {useStore} from "vuex";
 import {Task} from "../../server/assets/Task.js";
 
@@ -15,9 +15,11 @@ export default {
     TaskItem
   },
   mounted() {
+    // console.log('mounted');
     if (!isConnected()) this.$router.push({path: '/'});
   },
   setup() {
+    // console.log('setup')
     if (isConnected()) {
       getTasksUpdate();
       const store = useStore();
@@ -34,14 +36,14 @@ export default {
         players: players.value
       };
     }
-    return {};
+    return {
+      tasks: [],
+      gameMaster: false,
+      players: []
+    };
   },
-  // watch:{
-  //   tasks(newVal){
-  //     console.log(newVal);
-  //   }
-  // },
   methods: {
+    endGame,
     deletTask(index) {
       this.$store.commit('removeTask', index);
     }
@@ -52,16 +54,7 @@ export default {
 
 <template>
   <v-sheet height="500px" class="pa-6 bg-amber-lighten-3">
-    <div v-if="!gameMaster">
-      <h1>Feladatok</h1>
-      <v-list lines="one" class="bg-amber-accent-1">
-        <div v-for="(task,index) in tasks" :key="task">
-          <TaskItem v-if="!task.inactive" :task="Task.fromObject(task)" @timerZero="deletTask(index)" class="mt-2"/>
-          <!--      <md-divider v-if="index !== tasks.length - 1" class="m-2"/>-->
-        </div>
-      </v-list>
-    </div>
-    <div v-else>
+    <div v-if="gameMaster">
       <h1>Játékosok</h1>
       <v-container>
         <v-row>
@@ -73,6 +66,16 @@ export default {
           </v-col>
         </v-row>
       </v-container>
+      <v-btn @click="endGame()">Játék vége</v-btn>
+    </div>
+    <div>
+      <h1>Feladatok</h1>
+      <v-list lines="one" class="bg-amber-accent-1">
+        <div v-for="(task,index) in tasks" :key="task">
+          <TaskItem v-if="!task.inactive" :task="Task.fromObject(task)" @timerZero="deletTask(index)" class="mt-2"/>
+          <!--      <md-divider v-if="index !== tasks.length - 1" class="m-2"/>-->
+        </div>
+      </v-list>
     </div>
   </v-sheet>
 </template>

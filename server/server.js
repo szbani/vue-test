@@ -1,4 +1,3 @@
-// const websocket = require('ws');
 import {Task} from "./assets/Task.js";
 import {Player} from "./assets/player.js"
 import express from 'express';
@@ -17,13 +16,29 @@ const io = new Server(server, {
     }
 });
 
-const connections = {}
+let connections = {}
 
 io.on('connection', socket => {
     console.log('Client connected');
-    startTaskCreation();
     const userId = uuidv4();
     connections[userId] = socket;
+    let pingTimer = 31;
+    let pingInterval = setInterval(() => {
+        if (pingTimer <= 0) {
+            console.log('Client disconnected');
+            delete connections[userId];
+            Players.deletePlayer(userId);
+            io.emit('sendPlayers', Players.players);
+            socket.disconnect();
+            clearInterval(pingInterval);
+            pingInterval = null;
+        }
+        pingTimer--;
+    }, 1000);
+
+    socket.on('ping', () => {
+        pingTimer = 31;
+    });
 
     socket.emit('message', 'Welcome to the chat!');
     if (Tasks.tasks.length > 0) {
@@ -43,13 +58,26 @@ io.on('connection', socket => {
         console.log('Sending tasks update');
         socket.emit('tasksUpdated', Tasks.getValidTasks());
     });
-    // socket.on('')
+
     socket.on('newPlayer', (playerName) => {
-        console.log('new player:' + playerName)
-        const newPlayer = new Player(userId, playerName);
-        Players.addPlayer(newPlayer);
-        socket.emit('setPlayer', newPlayer);
-        io.emit('sendPlayers', Players.players);
+        let nameExist = false;
+        for (let i = 0; i < Players.players.length; i++) {
+            if (Players.players[i].data.name === playerName) {
+                nameExist = true;
+                break;
+            }
+        }
+        if (gameStarted) {
+            socket.emit('gameInProgress');
+        } else if (nameExist) {
+            socket.emit('nameExists');
+        } else {
+            console.log('new player:' + playerName)
+            const newPlayer = new Player(userId, playerName);
+            Players.addPlayer(newPlayer);
+            socket.emit('setPlayer', newPlayer);
+            io.emit('sendPlayers', Players.players);
+        }
     });
     socket.on('getPlayers', () => {
         // console.log(Players.players);
@@ -59,6 +87,7 @@ io.on('connection', socket => {
     socket.on('startGame', () => {
         console.log('Game started');
         gameStarted = true;
+        startTaskCreation();
         // console.log(Players.players);
         Players.players.forEach(player => {
             // console.log(player.data.id);
@@ -66,8 +95,18 @@ io.on('connection', socket => {
         });
     });
 
-    socket.on('isGameStarted', () => {
-        socket.emit('gameStarted', gameStarted);
+    socket.on('endGame', () => {
+        io.emit('endGame');
+        stopTaskCreation();
+        Tasks.tasks = [];
+        taskNumber = 1;
+        Players.players = [];
+        connections = {};
+        gameStarted = false;
+    });
+
+    socket.on('getGameStarted', () => {
+        socket.emit('getGameStarted', gameStarted);
     });
 
     socket.on('close', () => {
@@ -75,8 +114,11 @@ io.on('connection', socket => {
         delete connections[userId];
         Players.deletePlayer(userId);
         io.emit('sendPlayers', Players.players);
+        clearInterval(pingInterval);
+        pingInterval = null;
     });
 });
+
 
 export function sendPlayersToPlayer(userId) {
     const socket = connections[userId];
@@ -149,7 +191,7 @@ const Players = {
     updatePlayer(player) {
         this.players.players.find(p => p.data.id === player.data.id);
     },
-    deletePlayer(id){
+    deletePlayer(id) {
         this.players = this.players.filter(player => player.data.id !== id);
     }
 
